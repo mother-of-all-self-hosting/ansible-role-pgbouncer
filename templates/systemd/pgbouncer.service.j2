@@ -32,6 +32,9 @@ ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       {% else %}
       --network={{ pgbouncer_container_network }} \
       {% endif %}
+      {% if pgbouncer_container_http_host_bind_port %}
+      -p {{ pgbouncer_container_http_host_bind_port }}:{{ pgbouncer_container_http_port }} \
+      {% endif %}
       --env-file={{ pgbouncer_base_path }}/env \
       {{ pgbouncer_container_image_self_build_name if pgbouncer_container_image_self_build else pgbouncer_container_image }} \
       {% for arg in pgbouncer_process_extra_arguments %}
