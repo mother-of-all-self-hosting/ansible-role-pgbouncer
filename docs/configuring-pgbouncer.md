@@ -48,19 +48,6 @@ pgbouncer_enabled: true
 ########################################################################
 ```
 
-### Operating the proxy with unrestricted NAT
-
-The project recommends to run the proxy on a server behind no or unrestricted NAT, therefore the role is configured to pass the [`--net=host`](https://docs.docker.com/engine/network/drivers/host/) option to the Docker command.
-
-You can disable the option by adding the following configuration to your `vars.yml` file:
-
-```yaml
-pgbouncer_container_network_host_enabled: false
-```
-
->[!NOTE]
-> If the proxy does not run with the unrestricted NAT type enabled, make sure to check the firewall. Setting the `-ephemeral-ports-range` option to `pgbouncer_process_extra_arguments_custom` might work as well.
-
 ### Extending the configuration
 
 There are some additional things you may wish to configure about the service.

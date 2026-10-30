@@ -27,11 +27,7 @@ ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       --user={{ pgbouncer_uid }}:{{ pgbouncer_gid }} \
       --cap-drop=ALL \
       --read-only \
-      {% if pgbouncer_container_network_host_enabled %}
-      --net=host \
-      {% else %}
       --network={{ pgbouncer_container_network }} \
-      {% endif %}
       {% if pgbouncer_container_http_host_bind_port %}
       -p {{ pgbouncer_container_http_host_bind_port }}:{{ pgbouncer_container_http_port }} \
       {% endif %}
@@ -41,12 +37,9 @@ ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       {{ arg }} \
       {% endfor %}
 
-{% if pgbouncer_container_network_host_enabled %}
-{% else %}
 {% for network in pgbouncer_container_additional_networks %}
 ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} network connect {{ network }} {{ pgbouncer_identifier }}
 {% endfor %}
-{% endif %}
 
 ExecStart={{ devture_systemd_docker_base_host_command_docker }} start --attach {{ pgbouncer_identifier }}
 

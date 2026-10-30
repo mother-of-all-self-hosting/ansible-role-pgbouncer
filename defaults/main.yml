@@ -101,16 +101,6 @@ pgbouncer_container_cleanup_command: |
 # Specify the timezone
 pgbouncer_environment_variables_tz: UTC
 
-# Control if `--net=host` is enabled to operate the PgBouncer with an unrestricted NAT
-# Note that the proxy also works with a restricted NAT though running with an unrestricted one is recommended by the project
-#
-# See:
-# - https://docs.docker.com/engine/network/drivers/host/
-# - https://community.torproject.org/relay/setup/pgbouncer/standalone/
-# - https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/pgbouncer/-/raw/main/docker-compose.yml
-# - https://forum.torproject.org/t/how-to-set-up-standalone-pgbouncer-behind-restrictive-nat/16693
-pgbouncer_container_network_host_enabled: true
-
 # Additional environment variables.
 pgbouncer_environment_variables_additional_variables: ""
 
