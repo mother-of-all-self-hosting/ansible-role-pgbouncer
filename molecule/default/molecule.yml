@@ -10,7 +10,7 @@ dependency:
 driver:
   name: docker
 platforms:
-  - name: snowflake-${MOLECULE_DISTRO:-ubuntu2604}-default
+  - name: pgbouncer-${MOLECULE_DISTRO:-ubuntu2604}-default
     image: "geerlingguy/docker-${MOLECULE_DISTRO:-ubuntu2604}-ansible:latest"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     volumes:
@@ -34,12 +34,12 @@ provisioner:
     group_vars:
       all:
         # Helper variables
-        snowflake_debug_service_enabled: false
-        snowflake_restarts_check_enabled: true
+        pgbouncer_debug_service_enabled: false
+        pgbouncer_restarts_check_enabled: true
 
-        # Variables for the standalone Snowflake proxy
-        snowflake_uid: 1000
-        snowflake_gid: 1000
+        # Variables for PgBouncer
+        pgbouncer_uid: 1000
+        pgbouncer_gid: 1000
   env:
     # Workaround for https://github.com/ansible/molecule/issues/4391
     ANSIBLE_ROLES_PATH: ${MOLECULE_PROJECT_DIRECTORY}/..:/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:~/.ansible/roles

@@ -2,9 +2,9 @@
 galaxy_info:
   author: Suguru Hirahara
   company: progressiv
-  role_name: snowflake
+  role_name: pgbouncer
   namespace: progressiv
-  description: Snowflake proxy
+  description: PgBouncer
   platforms:
     - name: Debian
       versions:

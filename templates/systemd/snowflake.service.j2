@@ -1,58 +1,58 @@
 {#
 SPDX-FileCopyrightText: 2024 Julian-Samuel Gebühr
-SPDX-FileCopyrightText: 2025 Suguru Hirahara
+SPDX-FileCopyrightText: 2025, 2026 Suguru Hirahara
 
 SPDX-License-Identifier: AGPL-3.0-or-later
 #}
 
 [Unit]
-Description=Snowflake proxy ({{ snowflake_identifier }})
-{% for service in snowflake_systemd_required_services_list %}
+Description=PgBouncer ({{ pgbouncer_identifier }})
+{% for service in pgbouncer_systemd_required_services_list %}
 Requires={{ service }}
 After={{ service }}
 {% endfor %}
-{% for service in snowflake_systemd_wanted_services_list %}
+{% for service in pgbouncer_systemd_wanted_services_list %}
 Wants={{ service }}
 {% endfor %}
 DefaultDependencies=no
 
 [Service]
 Type=simple
-ExecStartPre={{ devture_systemd_docker_base_host_command_sh }} -c '{{ snowflake_container_cleanup_command | trim | replace("\n", " ") }}'
+ExecStartPre={{ devture_systemd_docker_base_host_command_sh }} -c '{{ pgbouncer_container_cleanup_command | trim | replace("\n", " ") }}'
 
 ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       --rm \
-      --name={{ snowflake_identifier }} \
+      --name={{ pgbouncer_identifier }} \
       --log-driver=none \
-      --user={{ snowflake_uid }}:{{ snowflake_gid }} \
+      --user={{ pgbouncer_uid }}:{{ pgbouncer_gid }} \
       --cap-drop=ALL \
       --read-only \
-      {% if snowflake_container_network_host_enabled %}
+      {% if pgbouncer_container_network_host_enabled %}
       --net=host \
       {% else %}
-      --network={{ snowflake_container_network }} \
+      --network={{ pgbouncer_container_network }} \
       {% endif %}
-      --env-file={{ snowflake_base_path }}/env \
-      {{ snowflake_container_image_self_build_name if snowflake_container_image_self_build else snowflake_container_image }} \
-      {% for arg in snowflake_process_extra_arguments %}
+      --env-file={{ pgbouncer_base_path }}/env \
+      {{ pgbouncer_container_image_self_build_name if pgbouncer_container_image_self_build else pgbouncer_container_image }} \
+      {% for arg in pgbouncer_process_extra_arguments %}
       {{ arg }} \
       {% endfor %}
 
-{% if snowflake_container_network_host_enabled %}
+{% if pgbouncer_container_network_host_enabled %}
 {% else %}
-{% for network in snowflake_container_additional_networks %}
-ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} network connect {{ network }} {{ snowflake_identifier }}
+{% for network in pgbouncer_container_additional_networks %}
+ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} network connect {{ network }} {{ pgbouncer_identifier }}
 {% endfor %}
 {% endif %}
 
-ExecStart={{ devture_systemd_docker_base_host_command_docker }} start --attach {{ snowflake_identifier }}
+ExecStart={{ devture_systemd_docker_base_host_command_docker }} start --attach {{ pgbouncer_identifier }}
 
-ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} stop -t {{ devture_systemd_docker_base_container_stop_grace_time_seconds }} {{ snowflake_identifier }} 2>/dev/null || true'
-ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ snowflake_identifier }} 2>/dev/null || true'
+ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} stop -t {{ devture_systemd_docker_base_container_stop_grace_time_seconds }} {{ pgbouncer_identifier }} 2>/dev/null || true'
+ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ pgbouncer_identifier }} 2>/dev/null || true'
 
 Restart=always
 RestartSec=30
-SyslogIdentifier={{ snowflake_identifier }}
+SyslogIdentifier={{ pgbouncer_identifier }}
 
 [Install]
 WantedBy=multi-user.target

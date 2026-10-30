@@ -49,7 +49,7 @@ Currently there is one testing scenario available.
 
 ### `default`
 
-Tests a standard the standalone Snowflake proxy installation.
+Tests a standard PgBouncer installation.
 
 ## Running
 
