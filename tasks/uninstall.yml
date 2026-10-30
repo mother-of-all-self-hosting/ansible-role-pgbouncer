@@ -1,0 +1,50 @@
+# SPDX-FileCopyrightText: 2023, 2024 Slavi Pantaleev
+# SPDX-FileCopyrightText: 2024 Julian-Samuel Gebühr
+# SPDX-FileCopyrightText: 2025 Suguru Hirahara
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+---
+- name: Check existence of the standalone Snowflake proxy systemd service
+  ansible.builtin.stat:
+    path: "{{ devture_systemd_docker_base_systemd_path }}/{{ snowflake_identifier }}.service"
+  register: snowflake_service_stat
+
+- name: Uninstall the standalone Snowflake proxy systemd services and files
+  when: snowflake_service_stat.stat.exists | bool
+  block:
+    - name: Ensure the standalone Snowflake proxy systemd service is stopped
+      ansible.builtin.service:
+        name: "{{ snowflake_identifier }}"
+        state: stopped
+        enabled: false
+        daemon_reload: true
+
+    - name: Ensure the standalone Snowflake proxy systemd service does not exist
+      ansible.builtin.file:
+        path: "{{ devture_systemd_docker_base_systemd_path }}/{{ snowflake_identifier }}.service"
+        state: absent
+
+    - name: Ensure the standalone Snowflake proxy container network does not exist
+      when: snowflake_container_network_deletion_enabled
+      block:
+        - name: Ensure the standalone Snowflake proxy container network does not exist via community.docker.docker_network
+          when: devture_systemd_docker_base_container_network_creation_method == 'ansible-module'
+          community.docker.docker_network:
+            name: "{{ snowflake_container_network }}"
+            state: absent
+          register: snowflake_network_deletion_result
+
+        - name: Ensure the standalone Snowflake proxy container network does not exist via ansible.builtin.command
+          when: devture_systemd_docker_base_container_network_creation_method == 'command'
+          ansible.builtin.command:
+            cmd: >-
+              {{ devture_systemd_docker_base_host_command_docker }} network rm
+              {{ snowflake_container_network }}
+          register: snowflake_network_deletion_result
+          changed_when: snowflake_container_network in snowflake_network_deletion_result.stdout
+
+    - name: Ensure the standalone Snowflake proxy path does not exist
+      ansible.builtin.file:
+        path: "{{ snowflake_base_path }}"
+        state: absent

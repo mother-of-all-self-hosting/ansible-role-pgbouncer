@@ -1,0 +1,121 @@
+# SPDX-FileCopyrightText: 2023, 2024 Nikita Chernyi
+# SPDX-FileCopyrightText: 2023-2025 Slavi Pantaleev
+# SPDX-FileCopyrightText: 2024 Julian-Samuel Gebühr
+# SPDX-FileCopyrightText: 2024 Sergio Durigan Junior
+# SPDX-FileCopyrightText: 2025 MASH project contributors
+# SPDX-FileCopyrightText: 2025 Suguru Hirahara
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+---
+# Project source code URL: https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/
+
+snowflake_enabled: true
+
+snowflake_identifier: snowflake
+snowflake_base_path: "/{{ snowflake_identifier }}"
+
+snowflake_version: v2.15.2
+
+snowflake_uid: ""
+snowflake_gid: ""
+
+snowflake_container_image: "{{ snowflake_container_image_registry_prefix }}pluggable-transports/snowflake:{{ snowflake_container_image_tag }}"
+snowflake_container_image_tag: "{{ snowflake_version }}"
+snowflake_container_image_registry_prefix: "{{ snowflake_container_image_registry_prefix_upstream }}"
+snowflake_container_image_registry_prefix_upstream: "{{ snowflake_container_image_registry_prefix_upstream_default }}"
+snowflake_container_image_registry_prefix_upstream_default: containers.torproject.org/tpo/anti-censorship/
+
+snowflake_container_image_self_build: false
+snowflake_container_image_self_build_name: "pluggable-transports/snowflake:{{ snowflake_container_image_self_build_repo_version }}"
+snowflake_container_image_self_build_repo: "https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake.git"
+snowflake_container_image_self_build_repo_version: main
+snowflake_container_image_self_build_src_files_path: "{{ snowflake_base_path }}/docker-src"
+
+# The base container network. It will be auto-created by this role if it doesn't exist already.
+snowflake_container_network: "{{ snowflake_identifier }}"
+
+# Control if the container network is deleted on uninstalling.
+snowflake_container_network_deletion_enabled: true
+
+# A list of additional container networks that the container would be connected to.
+# The role does not create these networks, so make sure they already exist.
+# Use this to expose this container to a reverse proxy, which runs in a different container network.
+snowflake_container_additional_networks: "{{ snowflake_container_additional_networks_auto + snowflake_container_additional_networks_custom }}"
+snowflake_container_additional_networks_auto: []
+snowflake_container_additional_networks_custom: []
+
+# A list of extra arguments to pass to the process inside the container
+# Example: ['--SOME_ARGUMENT']
+snowflake_process_extra_arguments: "{{ snowflake_process_extra_arguments_auto + snowflake_process_extra_arguments_custom }}"
+snowflake_process_extra_arguments_auto: []
+snowflake_process_extra_arguments_custom: []
+
+# List of systemd services that the standalone Snowflake proxy systemd service depends on
+snowflake_systemd_required_services_list: "{{ snowflake_systemd_required_services_list_default + snowflake_systemd_required_services_list_auto + snowflake_systemd_required_services_list_custom }}"
+snowflake_systemd_required_services_list_default: "{{ [devture_systemd_docker_base_docker_service_name] if devture_systemd_docker_base_docker_service_name else [] }}"
+snowflake_systemd_required_services_list_auto: []
+snowflake_systemd_required_services_list_custom: []
+
+# List of systemd services that the standalone Snowflake proxy systemd service wants
+snowflake_systemd_wanted_services_list: "{{ snowflake_systemd_wanted_services_list_default + snowflake_systemd_wanted_services_list_auto + snowflake_systemd_wanted_services_list_custom }}"
+snowflake_systemd_wanted_services_list_default: []
+snowflake_systemd_wanted_services_list_auto: []
+snowflake_systemd_wanted_services_list_custom: []
+
+# Controls how long to wait for the container to stop gracefully before killing it.
+snowflake_container_stop_grace_time_seconds: "{{ devture_systemd_docker_base_container_stop_grace_time_seconds }}"
+
+# Controls how long the pre-start cleanup should wait for stale container-name release
+# before failing startup explicitly.
+snowflake_container_cleanup_timeout_seconds: "{{ devture_systemd_docker_base_container_cleanup_timeout_seconds }}"
+
+# Controls the delay between pre-start cleanup retries.
+snowflake_container_cleanup_retry_delay_seconds: "{{ devture_systemd_docker_base_container_cleanup_retry_delay_seconds }}"
+
+# Shell command used in the systemd pre-start phase to deterministically remove a stale
+# container and wait until Docker releases its name.
+snowflake_container_cleanup_command: |
+  i=0;
+  while [ "$i" -lt {{ snowflake_container_cleanup_timeout_seconds }} ]; do
+  {{ devture_systemd_docker_base_host_command_docker }} stop -t {{ snowflake_container_stop_grace_time_seconds }} {{ snowflake_identifier }} >/dev/null 2>&1 || true;
+  {{ devture_systemd_docker_base_host_command_docker }} rm -f {{ snowflake_identifier }} >/dev/null 2>&1 || true;
+  if {{ devture_systemd_docker_base_host_command_docker }} container inspect {{ snowflake_identifier }} >/dev/null 2>&1; then
+  i=$((i + 1));
+  sleep {{ snowflake_container_cleanup_retry_delay_seconds }};
+  continue;
+  fi;
+  if {{ devture_systemd_docker_base_host_command_docker }} info >/dev/null 2>&1; then
+  exit 0;
+  fi;
+  echo "Failed to query Docker daemon while cleaning up {{ snowflake_identifier }}" >&2;
+  exit 1;
+  done;
+  echo "Failed to remove stale container {{ snowflake_identifier }} after {{ snowflake_container_cleanup_timeout_seconds }} attempts" >&2;
+  exit 1
+
+# Specify the timezone
+snowflake_environment_variables_tz: UTC
+
+# Control if `--net=host` is enabled to operate the Snowflake proxy with an unrestricted NAT
+# Note that the proxy also works with a restricted NAT though running with an unrestricted one is recommended by the project
+#
+# See:
+# - https://docs.docker.com/engine/network/drivers/host/
+# - https://community.torproject.org/relay/setup/snowflake/standalone/
+# - https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/raw/main/docker-compose.yml
+# - https://forum.torproject.org/t/how-to-set-up-standalone-snowflake-behind-restrictive-nat/16693
+snowflake_container_network_host_enabled: true
+
+# Additional environment variables.
+snowflake_environment_variables_additional_variables: ""
+
+# snowflake_restart_necessary controls whether the standalone Snowflake proxy systemd
+# service will be restarted (when true) or merely started (when false) by the
+# systemd service manager role (when conditional restart is enabled).
+#
+# This value is automatically computed during installation based on whether
+# any configuration files, the systemd service file, or the container image changed.
+# The default of `false` means "no restart needed" — appropriate when the role's
+# installation tasks haven't run (e.g., due to --tags skipping them).
+snowflake_restart_necessary: false
