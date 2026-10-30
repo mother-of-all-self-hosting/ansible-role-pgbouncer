@@ -32,6 +32,9 @@ ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       -p {{ pgbouncer_container_http_host_bind_port }}:{{ pgbouncer_container_http_port }} \
       {% endif %}
       --env-file={{ pgbouncer_base_path }}/env \
+      {% for volume in pgbouncer_container_additional_volumes %}
+      --mount type={{ volume.type | default('bind' if '/' in volume.src else 'volume') }},src={{ volume.src }},dst={{ volume.dst }}{{ (',' + volume.options) if volume.options | default('') else '' }} \
+      {% endfor %}
       {{ pgbouncer_container_image }} \
       {% for arg in pgbouncer_process_extra_arguments %}
       {{ arg }} \
