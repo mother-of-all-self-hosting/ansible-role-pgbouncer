@@ -26,12 +26,7 @@ pgbouncer_container_image_tag: "{{ pgbouncer_version }}"
 pgbouncer_container_image_registry_prefix: "{{ pgbouncer_container_image_registry_prefix_upstream }}"
 pgbouncer_container_image_registry_prefix_upstream: "{{ pgbouncer_container_image_registry_prefix_upstream_default }}"
 pgbouncer_container_image_registry_prefix_upstream_default: docker.io/
-
-pgbouncer_container_image_self_build: false
-pgbouncer_container_image_self_build_name: "pgbouncer/pgbouncer:{{ pgbouncer_container_image_self_build_repo_version }}"
-pgbouncer_container_image_self_build_repo: "https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/pgbouncer.git"
-pgbouncer_container_image_self_build_repo_version: main
-pgbouncer_container_image_self_build_src_files_path: "{{ pgbouncer_base_path }}/docker-src"
+# TODO: add tasks to self-build the image
 
 # The base container network. It will be auto-created by this role if it doesn't exist already.
 pgbouncer_container_network: "{{ pgbouncer_identifier }}"
