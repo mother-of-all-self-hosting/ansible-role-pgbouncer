@@ -40,6 +40,25 @@ provisioner:
         # Variables for PgBouncer
         pgbouncer_uid: 1000
         pgbouncer_gid: 1000
+
+        # Variables required for PgBouncer to connect to the Postgres database (via Unix socket)
+        pgbouncer_environment_variables_databases_host: "{{ pgbouncer_database_socket_path_container }}"
+        pgbouncer_environment_variables_databases_port: "{{ postgres_connection_port }}"
+        pgbouncer_environment_variables_databases_user: "{{ postgres_connection_username }}"
+        pgbouncer_environment_variables_databases_password: "{{ postgres_connection_password }}"
+        pgbouncer_environment_variables_databases_dbname: "{{ postgres_db_name }}"
+        pgbouncer_database_socket_enabled: true
+        pgbouncer_database_socket_path_host: "{{ postgres_run_path }}"
+        pgbouncer_systemd_required_services_list_auto: |
+          {{
+            (['postgres.service'])
+          }}
+
+        # Variables for Postgres
+        postgres_uid: 1000
+        postgres_gid: 1000
+        postgres_connection_password: postgres_password
+        postgres_container_unix_socket_enabled: true
   env:
     # Workaround for https://github.com/ansible/molecule/issues/4391
     ANSIBLE_ROLES_PATH: ${MOLECULE_PROJECT_DIRECTORY}/..:/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:~/.ansible/roles

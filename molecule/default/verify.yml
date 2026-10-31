@@ -11,11 +11,20 @@
 
   vars:
     pgbouncer_verify_units:
+      - postgres.service
       - pgbouncer.service
 
   tasks:
     - name: Verify that PgBouncer works
       block:
+        # The role is not included in this playbook, so its defaults are not in
+        # scope. Reading defaults/main.yml directly ties the version assertion
+        # below.
+        - name: Load the role defaults
+          ansible.builtin.include_vars:
+            file: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}/defaults/main.yml"
+            name: pgbouncer_defaults
+
         - name: Wait for the PgBouncer systemd services to become active (up to 180s each)
           ansible.builtin.systemd_service:
             name: "{{ item }}"
@@ -45,6 +54,39 @@
             cmd: "journalctl --no-pager --output=cat --unit={{ item }}"
           changed_when: false
           loop: "{{ pgbouncer_verify_units }}"
+
+        - name: Verify PgBouncer version
+          block:
+            - name: Retrieve the PgBouncer systemd service log
+              ansible.builtin.command:
+                cmd: journalctl --no-pager --output=cat --unit=pgbouncer.service
+              register: pgbouncer_journal
+              changed_when: false
+
+            - name: Extract PgBouncer version from the systemd service log
+              ansible.builtin.set_fact:
+                pgbouncer_verify_version: >-
+                  {{
+                    (pgbouncer_journal.stdout_lines | select('search', 'LOG process up: PgBouncer') | list | first | default('')) | regex_replace('^.*PgBouncer ([0-9]+\.[0-9]+\.[0-9]+).*$', '\1')
+                  }}
+
+            - name: Inspect the PgBouncer container
+              ansible.builtin.command:
+                cmd: docker container inspect pgbouncer
+              changed_when: false
+              register: pgbouncer_container_raw
+
+            - name: Read the PgBouncer container's configuration
+              ansible.builtin.set_fact:
+                pgbouncer_container: "{{ (pgbouncer_container_raw.stdout | from_json)[0] }}"
+
+            - name: Assert the running PgBouncer is the version this role installs
+              ansible.builtin.assert:
+                that:
+                  - pgbouncer_verify_version == pgbouncer_defaults.pgbouncer_version | string
+                  - pgbouncer_container.Config.Labels['org.opencontainers.image.version'] == pgbouncer_defaults.pgbouncer_version | string
+                fail_msg: "PgBouncer reports {{ pgbouncer_container.Config.Labels['org.opencontainers.image.version'] | default('none') }}, expected {{ pgbouncer_defaults.pgbouncer_version }}"
+                success_msg: "PgBouncer reports {{ pgbouncer_container.Config.Labels['org.opencontainers.image.version'] }}"
 
         - name: Verify nothing was quietly restarting while all of that was being checked
           when: "pgbouncer_restarts_check_enabled | bool"
@@ -90,6 +132,7 @@
             msg:
               - "PgBouncer systemd: {% for unit, state in pgbouncer_verify_units | zip(pgbouncer_services.results | map(attribute='status.ActiveState')) %}{{ unit }} ({{ state }}){% if not loop.last %}, {% endif %}{% endfor %}"
               - "PgBouncer restarts: {% for unit, restarts in pgbouncer_verify_units | zip(pgbouncer_restarts_after.results | map(attribute='status.NRestarts')) %}{{ restarts }} ({{ unit }}){% if not loop.last %}, {% endif %}{% endfor %}"
+              - "PgBouncer version: {{ pgbouncer_container.Config.Labels['org.opencontainers.image.version'] }}"
 
       rescue:
         # Whatever went wrong, the reason is almost always in the systemd service log.
