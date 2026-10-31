@@ -18,7 +18,7 @@ pgbouncer_data_path: "{{ pgbouncer_base_path }}/data"
 # The host path where the PgBouncer Unix socket directory is mounted (when enabled).
 pgbouncer_run_path: "{{ pgbouncer_base_path }}/run"
 
-# renovate: datasource=docker depName=pgbouncer/pgbouncer
+# renovate: datasource=docker depName=pgbouncer/pgbouncer versioning=semver
 pgbouncer_version: 1.25.1
 
 pgbouncer_uid: ""
