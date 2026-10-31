@@ -10,7 +10,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 ✨👾 *This role is developed on [Radicle](https://radicle.dev), a peer-to-peer code collaboration stack built on Git.*
 
-This is an [Ansible](https://www.ansible.com/) role which installs [PgBouncer](https://community.torproject.org/relay/setup/pgbouncer/standalone/) to run as a [Docker](https://www.docker.com/) container wrapped in a systemd service.
+This is an [Ansible](https://www.ansible.com/) role which installs [PgBouncer](https://www.pgbouncer.org/) to run as a [Docker](https://www.docker.com/) container wrapped in a systemd service.
 
 This role *implicitly* depends on:
 
@@ -18,8 +18,6 @@ This role *implicitly* depends on:
 - [`com.devture.ansible.role.systemd_docker_base`](https://github.com/devture/com.devture.ansible.role.systemd_docker_base)
 
 Check [`defaults/main.yml`](defaults/main.yml) for the full list of supported options. Refer to [this page](docs/configuring-pgbouncer.md) for details about setting up the service with this role.
-
-💡 For an Ansible playbook which integrates this role and makes it easier to use, see the [Mother-of-All-Self-Hosting Ansible playbook](https://radicle.network/nodes/progressiv.radicle.garden/rad%3Az2SXkaceJw3YmS89T1xGysnFSjWsw).
 
 ## Development
 
@@ -32,7 +30,7 @@ Please follow [this "Getting Started" guide](https://radicle.dev/guides/quick-st
 You can clone the repository by running the command below:
 
 ```sh
-rad clone rad:znvd313jEb23f9AUNmtsweE7YHCK
+rad clone rad:z3oYuZkAzW85ZhAKZyb7Wv6AvTVox
 ```
 
 💡 When you only want to "seed" a repository and have no interest in contributing code, you can still be a repository’s friend with the `rad seed` command. This is Radicle’s version of a ⭐ *star* or 👍 *like*, where you care by sharing it with others on the network.

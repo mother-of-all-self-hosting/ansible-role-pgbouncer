@@ -20,11 +20,14 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 # Setting up PgBouncer
 
-This is an [Ansible](https://www.ansible.com/) role which installs [PgBouncer](https://community.torproject.org/relay/setup/pgbouncer/standalone/) to run as a [Docker](https://www.docker.com/) container wrapped in a systemd service.
+This is an [Ansible](https://www.ansible.com/) role which installs [PgBouncer](https://www.pgbouncer.org/) to run as a [Docker](https://www.docker.com/) container wrapped in a systemd service.
 
-The standalone [Snowflake](https://pgbouncer.torproject.org/) proxy helps users connect to the [Tor](https://torproject.org/) network in places where Tor is blocked. The project claims that one of the main advantages of standalone Snowflake proxies is that they can be installed on servers and offer a higher bandwidth and more reliable option for users behind restrictive NATs and firewalls.
+PgBouncer is a PostgreSQL connection pooler. Any target application can be connected to PgBouncer as if it were a PostgreSQL server, and PgBouncer will create a connection to the actual server, or it will reuse one of its existing connections.
 
-See the project's [documentation](https://community.torproject.org/relay/setup/pgbouncer/standalone/) to learn what PgBouncer does and why it might be useful to you.
+See the project's [documentation](https://www.pgbouncer.org/usage.html) to learn what PgBouncer does and why it might be useful to you.
+
+>[!NOTE]
+> This role uses the image provided by [Canary9](https://canary9.com/).
 
 ## Adjusting the playbook configuration
 
@@ -105,7 +108,7 @@ Take a look at:
 
 - [`defaults/main.yml`](../defaults/main.yml) for some variables that you can customize via your `vars.yml` file. You can override settings (even those that don't have dedicated playbook variables) using the `pgbouncer_environment_variables_additional_variables` variable
 
-Refer to [this section](https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/pgbouncer/-/tree/main/proxy?ref_type=heads#running-a-standalone-pgbouncer-proxy) for the list of options you can pass to `pgbouncer_process_extra_arguments_custom`.
+Refer to [this section](https://www.pgbouncer.org/config.html) for a complete list of asciinema's config options that you can put in `pgbouncer_environment_variables_additional_variables`.
 
 ## Installing
 
@@ -122,6 +125,8 @@ If you use the MASH playbook, the shortcut commands with the [`just` program](ht
 After running the command for installation, PgBouncer becomes available.
 
 ## Troubleshooting
+
+FAQ is available on [this page](https://www.pgbouncer.org/faq.html).
 
 ### Check the service's logs
 
