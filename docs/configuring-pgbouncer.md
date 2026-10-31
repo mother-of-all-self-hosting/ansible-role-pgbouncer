@@ -126,3 +126,11 @@ After running the command for installation, PgBouncer becomes available.
 ### Check the service's logs
 
 You can find the logs in [systemd-journald](https://www.freedesktop.org/software/systemd/man/systemd-journald.service.html) by logging in to the server with SSH and running `journalctl -fu pgbouncer` (or how you/your playbook named the service, e.g. `mash-pgbouncer`).
+
+#### Increase logging verbosity
+
+If you want to increase the verbosity, add the following configuration to your `vars.yml` file:
+
+```yaml
+pgbouncer_environment_variables_pgbouncer_verbose: 3
+```

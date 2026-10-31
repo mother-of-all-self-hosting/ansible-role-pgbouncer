@@ -182,6 +182,8 @@ pgbouncer_environment_variables_pgbouncer_client_tls_sslmode: disable
 # Specify the timezone
 pgbouncer_environment_variables_tz: UTC
 
+pgbouncer_environment_variables_pgbouncer_verbose: 0
+
 # Additional environment variables.
 pgbouncer_environment_variables_additional_variables: ""
 
