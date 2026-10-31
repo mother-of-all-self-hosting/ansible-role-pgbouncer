@@ -8,8 +8,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 # PgBouncer Ansible role
 
-✨👾 *This role is developed on [Radicle](https://radicle.dev), a peer-to-peer code collaboration stack built on Git.*
-
 This is an [Ansible](https://www.ansible.com/) role which installs [PgBouncer](https://www.pgbouncer.org/) to run as a [Docker](https://www.docker.com/) container wrapped in a systemd service.
 
 This role *implicitly* depends on:
@@ -23,17 +21,13 @@ Check [`defaults/main.yml`](defaults/main.yml) for the full list of supported op
 
 ### Collaborating on Radicle
 
-This role is developed and distributed on Radicle, and you can freely open an issue or a "patch" for updating it.
-
-Please follow [this "Getting Started" guide](https://radicle.dev/guides/quick-start) on the official documentation for the basic installation and usage of the Radicle toolchain.
+The role can be cloned from the [Radicle](https://radicle.dev) network, a peer-to-peer code collaboration stack built on Git. Please follow [this "Getting Started" guide](https://radicle.dev/guides/quick-start) on the official documentation for the basic installation and usage of the Radicle toolchain.
 
 You can clone the repository by running the command below:
 
 ```sh
 rad clone rad:z3oYuZkAzW85ZhAKZyb7Wv6AvTVox
 ```
-
-💡 When you only want to "seed" a repository and have no interest in contributing code, you can still be a repository’s friend with the `rad seed` command. This is Radicle’s version of a ⭐ *star* or 👍 *like*, where you care by sharing it with others on the network.
 
 ### pre-commit
 

@@ -3,7 +3,7 @@ galaxy_info:
   author: Suguru Hirahara
   company: progressiv
   role_name: pgbouncer
-  namespace: progressiv
+  namespace: mash
   description: PgBouncer
   platforms:
     - name: Debian
