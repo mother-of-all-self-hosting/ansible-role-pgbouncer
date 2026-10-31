@@ -16,6 +16,16 @@
     - "{{ pgbouncer_base_path }}"
     - "{{ pgbouncer_data_path }}"
 
+- name: Ensure PgBouncer run path exists
+  ansible.builtin.file:
+    path: "{{ pgbouncer_run_path }}"
+    state: directory
+    mode: "0755"
+    owner: "{{ pgbouncer_uid }}"
+    group: "{{ pgbouncer_gid }}"
+  when: pgbouncer_container_unix_socket_enabled
+# Separate task to allow different permissions for Unix socket access.
+
 - name: Ensure PgBouncer support file installed
   ansible.builtin.template:
     src: "{{ role_path }}/templates/{{ item }}.j2"

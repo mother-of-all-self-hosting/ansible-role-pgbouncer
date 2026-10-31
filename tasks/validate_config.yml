@@ -34,3 +34,21 @@
       when: >-
         not pgbouncer_database_socket_enabled and
         pgbouncer_environment_variables_databases_host | string | length == 0
+
+- name: Fail if PgBouncer socket host path is missing when Unix socket is enabled
+  ansible.builtin.fail:
+    msg: >-
+      You need to define `pgbouncer_run_path_in_container` when
+      `pgbouncer_container_unix_socket_enabled` is `true`.
+  when: >-
+    pgbouncer_container_unix_socket_enabled and
+    pgbouncer_run_path_in_container | string | length == 0
+
+- name: Fail if PgBouncer hostname is missing when Unix socket is disabled
+  ansible.builtin.fail:
+    msg: >-
+      You need to define `pgbouncer_connection_hostname` when
+      `pgbouncer_container_unix_socket_enabled` is `false`.
+  when: >-
+    not pgbouncer_container_unix_socket_enabled and
+    pgbouncer_connection_hostname | string | length == 0

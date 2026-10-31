@@ -36,6 +36,9 @@ ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       {% if pgbouncer_database_socket_enabled and pgbouncer_database_socket_path_host != '' %}
       --mount type=bind,src={{ pgbouncer_database_socket_path_host }},dst={{ pgbouncer_database_socket_path_container }} \
       {% endif %}
+      {% if pgbouncer_container_unix_socket_enabled %}
+      --mount type=bind,src={{ pgbouncer_run_path }},dst={{ pgbouncer_run_path_in_container }} \
+      {% endif %}
       {% for volume in pgbouncer_container_additional_volumes %}
       --mount type={{ volume.type | default('bind' if '/' in volume.src else 'volume') }},src={{ volume.src }},dst={{ volume.dst }}{{ (',' + volume.options) if volume.options | default('') else '' }} \
       {% endfor %}

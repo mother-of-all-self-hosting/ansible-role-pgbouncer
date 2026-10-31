@@ -83,6 +83,20 @@ pgbouncer_environment_variables_databases_host: YOUR_POSTGRES_SERVER_HOSTNAME_HE
 pgbouncer_environment_variables_databases_port: 5432
 ```
 
+#### Configuring connections between PgBouncer and other applications
+
+By default the role is configured to accept Unix socket connections from other applications. The Unix socket is mounted on the directory specified with `pgbouncer_run_path` on the host. You can have other applications connect to PgBouncer (and thus the Postgres server) via the mounted socket.
+
+To disable connection via the Unix socket, add the following configuration to your `vars.yml` file:
+
+```yaml
+# Disable the connection to PgBouncer via a Unix socket
+pgbouncer_container_unix_socket_enabled: false
+
+pgbouncer_connection_hostname: YOUR_POSTGRES_SERVER_HOSTNAME_HERE
+pgbouncer_connection_port: 5432
+```
+
 ### Extending the configuration
 
 There are some additional things you may wish to configure about the service.
