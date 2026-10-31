@@ -48,6 +48,23 @@ pgbouncer_enabled: true
 ########################################################################
 ```
 
+### Configure connections among the Postgres server, PgBouncer, and other applications
+
+Because PgBouncer basically works as a proxy between your Postgres server and other applications, it is necessary to configure settings about connections both between the Postgres server and PgBouncer, and between Pgbouncer and other applications.
+
+#### Configuring connections between Postgres and PgBouncer
+
+To have PgBouncer connect to your Postgres server, add the following configuration to your `vars.yml` file:
+
+```yaml
+pgbouncer_environment_variables_databases_host: YOUR_POSTGRES_SERVER_HOSTNAME_HERE
+pgbouncer_environment_variables_databases_user: YOUR_POSTGRES_SERVER_USERNAME_HERE
+pgbouncer_environment_variables_databases_password: YOUR_POSTGRES_SERVER_PASSWORD_HERE
+pgbouncer_environment_variables_databases_dbname: YOUR_POSTGRES_SERVER_DATABASE_NAME_HERE
+```
+
+Make sure to replace the placeholders with your own values.
+
 ### Extending the configuration
 
 There are some additional things you may wish to configure about the service.

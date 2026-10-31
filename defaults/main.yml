@@ -41,7 +41,7 @@ pgbouncer_container_network_deletion_enabled: true
 pgbouncer_container_http_host_bind_port: ""
 
 # The port number in the container
-pgbouncer_container_http_port: 6432
+pgbouncer_container_http_port: "{{ pgbouncer_connection_port }}"
 
 # A list of additional container networks that the container would be connected to.
 # The role does not create these networks, so make sure they already exist.
@@ -107,6 +107,61 @@ pgbouncer_container_cleanup_command: |
   done;
   echo "Failed to remove stale container {{ pgbouncer_identifier }} after {{ pgbouncer_container_cleanup_timeout_seconds }} attempts" >&2;
   exit 1
+
+########################################################################
+#                                                                      #
+# Postgres ⇔ PgBouncer                                                 #
+#                                                                      #
+########################################################################
+
+# Specify database configuration (Postgres ⇔ PgBouncer)
+pgbouncer_environment_variables_databases_host: ""
+pgbouncer_environment_variables_databases_port: 5432
+pgbouncer_environment_variables_databases_user: ""
+pgbouncer_environment_variables_databases_password: ""
+# Specify TLS mode to use
+# See: https://www.pgbouncer.org/config.html#server_tls_sslmode
+pgbouncer_environment_variables_pgbouncer_server_tls_sslmode: prefer
+pgbouncer_environment_variables_databases_dbname: ""
+
+########################################################################
+#                                                                      #
+# /Postgres ⇔ PgBouncer                                                #
+#                                                                      #
+########################################################################
+
+########################################################################
+#                                                                      #
+# PgBouncer ⇔ Other applications                                       #
+#                                                                      #
+########################################################################
+
+# Specify a comma-separated list of addresses where to listen for TCP connections
+# When not set, only Unix socket connections are accepted
+# See: https://www.pgbouncer.org/config.html#listen_addr
+pgbouncer_connection_hostname: "{{ pgbouncer_identifier }}"
+
+# Specify the port to listen on
+# See: https://www.pgbouncer.org/config.html#listen_port
+pgbouncer_connection_port: 6432
+
+# Specify the location for Unix sockets
+# See: https://www.pgbouncer.org/config.html#unix_socket_dir
+pgbouncer_environment_variables_pgbouncer_unix_socket_dir: ""
+
+# Specify when a server connection can be reused by other clients
+# See: https://www.pgbouncer.org/config.html#pool_mode
+pgbouncer_environment_variables_pgbouncer_pool_mode: ""
+
+# Specify TLS mode to use for connections from clients
+# See: https://www.pgbouncer.org/config.html#client_tls_sslmode
+pgbouncer_environment_variables_pgbouncer_client_tls_sslmode: disable
+
+########################################################################
+#                                                                      #
+# /PgBouncer ⇔ Other applications                                      #
+#                                                                      #
+########################################################################
 
 # Specify the timezone
 pgbouncer_environment_variables_tz: UTC
