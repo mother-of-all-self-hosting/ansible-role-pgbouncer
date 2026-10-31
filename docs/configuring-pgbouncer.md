@@ -57,13 +57,31 @@ Because PgBouncer basically works as a proxy between your Postgres server and ot
 To have PgBouncer connect to your Postgres server, add the following configuration to your `vars.yml` file:
 
 ```yaml
-pgbouncer_environment_variables_databases_host: YOUR_POSTGRES_SERVER_HOSTNAME_HERE
 pgbouncer_environment_variables_databases_user: YOUR_POSTGRES_SERVER_USERNAME_HERE
 pgbouncer_environment_variables_databases_password: YOUR_POSTGRES_SERVER_PASSWORD_HERE
 pgbouncer_environment_variables_databases_dbname: YOUR_POSTGRES_SERVER_DATABASE_NAME_HERE
 ```
 
 Make sure to replace the placeholders with your own values.
+
+By default the role is configured to establish connection with the Postgres server via the Unix socket. You can mount the Unix socket by adding the following configuration to your `vars.yml` file:
+
+```yaml
+# Specify the path to the Postgres Unix socket path on the host (bind-mount source)
+pgbouncer_database_socket_path_host: ""
+```
+
+Setting it enables to connect to the Postgres server via Unix socket mounted in the container at `/run-postgres/.s.PGSQL.5432`.
+
+If TCP connection is preferred, connection via the Unix socket can be disabled by adding the following configuration to your `vars.yml` file:
+
+```yaml
+# Disable the connection to Postgres server via a Unix socket
+pgbouncer_database_socket_enabled: false
+
+pgbouncer_environment_variables_databases_host: YOUR_POSTGRES_SERVER_HOSTNAME_HERE
+pgbouncer_environment_variables_databases_port: 5432
+```
 
 ### Extending the configuration
 

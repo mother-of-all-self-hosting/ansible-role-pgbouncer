@@ -14,3 +14,23 @@
     - pgbouncer_uid
     - pgbouncer_gid
     - pgbouncer_container_network
+
+- name: PgBouncer + Postgres integration
+  block:
+    - name: Fail if Postgres socket host path for PgBouncer is missing when Unix socket is enabled
+      ansible.builtin.fail:
+        msg: >-
+          You need to define `pgbouncer_database_socket_path_host` when
+          `pgbouncer_database_socket_enabled` is `true`.
+      when: >-
+        pgbouncer_database_socket_enabled and
+        pgbouncer_database_socket_path_host | string | length == 0
+
+    - name: Fail if Postgres hostname for PgBouncer is missing when Unix socket is disabled
+      ansible.builtin.fail:
+        msg: >-
+          You need to define `pgbouncer_environment_variables_databases_host` when
+          `pgbouncer_database_socket_enabled` is `false`.
+      when: >-
+        not pgbouncer_database_socket_enabled and
+        pgbouncer_environment_variables_databases_host | string | length == 0

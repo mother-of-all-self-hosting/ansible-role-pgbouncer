@@ -121,8 +121,17 @@ pgbouncer_environment_variables_databases_user: ""
 pgbouncer_environment_variables_databases_password: ""
 # Specify TLS mode to use
 # See: https://www.pgbouncer.org/config.html#server_tls_sslmode
-pgbouncer_environment_variables_pgbouncer_server_tls_sslmode: prefer
+pgbouncer_environment_variables_pgbouncer_server_tls_sslmode: "{{ 'disable' if pgbouncer_database_socket_enabled else 'prefer' }}"
 pgbouncer_environment_variables_databases_dbname: ""
+
+# Control whether the database connection between PgBouncer and Postgres is made via a Unix socket
+pgbouncer_database_socket_enabled: true
+
+# Specify the path to the Postgres Unix socket path on the host (bind-mount source)
+pgbouncer_database_socket_path_host: ""
+
+# Specify the path to the Postgres Unix socket path inside the PgBouncer container
+pgbouncer_database_socket_path_container: /run-postgres
 
 ########################################################################
 #                                                                      #
