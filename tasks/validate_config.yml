@@ -13,7 +13,6 @@
   with_items:
     - pgbouncer_uid
     - pgbouncer_gid
-    - pgbouncer_container_network
 
 - name: PgBouncer + Postgres integration
   block:
