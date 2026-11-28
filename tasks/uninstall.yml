@@ -43,6 +43,7 @@
               {{ pgbouncer_container_network }}
           register: pgbouncer_network_deletion_result
           changed_when: pgbouncer_container_network in pgbouncer_network_deletion_result.stdout
+          failed_when: pgbouncer_network_deletion_result.rc != 0 and 'not found' not in pgbouncer_network_deletion_result.stderr
 
     - name: Ensure PgBouncer path does not exist
       ansible.builtin.file:
